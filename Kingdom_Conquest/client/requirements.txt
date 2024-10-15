@@ -1,0 +1,9 @@
+fastapi==0.115.0
+uvicorn==0.30.6
+psycopg2-binary==2.9.9
+SQLAlchemy==2.0.35
+pytest==8.3.3
+pip_audit==2.7.3
+httpx
+pytest-xdist==3.6.1
+requests-mock==1.12.1
