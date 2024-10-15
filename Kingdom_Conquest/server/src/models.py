@@ -15,7 +15,7 @@ class Reino(Base):
     estabilidad = Column(Integer, default=100)
 
     # Relación con Infraestructuras
-    infraestructuras = relationship("Infraestructura", back_populates="reino")
+    infraestructuras = relationship("Infraestructura", back_populates="reino", lazy='joined')
 
     # Relación con Eventos (historial de eventos del reino)
     eventos = relationship("Evento", back_populates="reino")
