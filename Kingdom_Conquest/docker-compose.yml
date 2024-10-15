@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: kingdom_user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: kingdom_db
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+  
+  api:
+    build: ./server
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgresql://kingdom_user:password@db:5432/kingdom_db
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./server:/app
+    command: uvicorn src.main:app --host 0.0.0.0 --port 8000
+
+volumes:
+  db_data:
