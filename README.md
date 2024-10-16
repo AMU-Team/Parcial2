@@ -60,6 +60,24 @@ El servidor expone los siguientes endpoints definidos en `routes.py`:
 - `POST /reinos/{reino_id}/accion`: Realiza una acción en un reino específico. Recibe la acción y los parámetros, y actualiza el reino en consecuencia.
 - `POST /reset`: Reinicia el juego. Elimina todos los datos de reinos, infraestructuras y eventos.
 
+## Integración Continua
+
+El proyecto utiliza GitHub Actions para la integración continua. El archivo `ci.yml` define los siguientes trabajos:
+
+- **tests**: Ejecuta las pruebas unitarias.
+  - Configura el entorno con Docker Compose.
+  - Instala dependencias y ejecuta las pruebas con `pytest`.
+  - Detiene y limpia los contenedores de Docker Compose después de ejecutar las pruebas.
+
+- **security-audit**: Ejecuta una auditoría de seguridad con `pip-audit`.
+  - Instala y ejecuta `pip-audit` para verificar las dependencias del proyecto.
+
+- **behavior-tests**: Ejecuta las pruebas de comportamiento.
+  - Configura el entorno con Docker Compose.
+  - Instala dependencias y ejecuta las pruebas de comportamiento con `behave`.
+  - Detiene y limpia los contenedores de Docker Compose después de ejecutar las pruebas.
+
+  
 ## Colaboradores
 
 - Arbués Pérez V
