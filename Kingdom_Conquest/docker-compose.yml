@@ -24,5 +24,27 @@ services:
       - ./server:/app
     command: uvicorn src.main:app --host 0.0.0.0 --port 8000
 
+# Servicio de Prometheus
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    depends_on:
+      - api
+      - db
+
+# Servicio de Grafana
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+
+
 volumes:
   db_data:
