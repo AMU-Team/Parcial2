@@ -26,7 +26,7 @@ jobs:
         run: |
           python -m venv env
           source env/bin/activate
-          pip install -r Kingdom_Conquest/requirements.txt  # Asegúrate de que esta ruta sea correcta
+          pip install -r Kingdom_Conquest//server/requirements.txt  # Asegúrate de que esta ruta sea correcta
           pytest Kingdom_Conquest/server/tests  # Ejecutar tests después de instalar dependencias
 
       # Detener y limpiar los contenedores de Docker Compose después de ejecutar los tests
