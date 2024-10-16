@@ -1,0 +1,63 @@
+name: CI Pipeline
+
+on: [push, pull_request]
+
+jobs: 
+  # Job para correr los tests
+  tests:
+    runs-on: ubuntu-latest
+
+    steps: 
+      - name: Check out the repository 
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+
+      # Levantar el entorno con Docker Compose
+      - name: Build and run Docker Compose 
+        run: |
+          docker compose up --build -d
+        working-directory: Kingdom_Conquest/ 
+
+      - name: Install dependencies and run tests
+        run: |
+          python -m venv env
+          source env/bin/activate
+          pip install -r Kingdom_Conquest/requirements.txt  # Asegúrate de que esta ruta sea correcta
+          pytest Kingdom_Conquest/server/tests  # Ejecutar tests después de instalar dependencias
+
+      # Detener y limpiar los contenedores de Docker Compose después de ejecutar los tests
+      - name: Stop and clean up Docker Compose
+        run: |
+          docker compose down
+        working-directory: Kingdom_Conquest/  
+
+  # Job para correr pip-audit en el proyecto completo
+  security-audit:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+
+      - name: Upgrade setuptools to a safe version
+        run: |
+          python -m venv env
+          source env/bin/activate
+          pip install --upgrade setuptools
+
+      - name: Install pip-audit and run it
+        run: |
+          python -m venv env
+          source env/bin/activate
+          pip install --upgrade pip
+          pip install pip-audit
+          pip-audit
