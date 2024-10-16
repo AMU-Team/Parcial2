@@ -97,5 +97,5 @@ def construir_infraestructura(db: Session, reino: Reino, params: dict) -> None:
     reino.oro -= infra.costo_oro
     reino.madera -= infra.costo_madera
     db.add(infra)
-    db.commit()  # Este commit guarda los cambios en la base de datos
+    db.commit()  
     db.refresh(reino)  # Actualiza el objeto 'reino' en la sesión para reflejar los cambios en la base de datos

@@ -3,10 +3,10 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from src.models import Base
-from src.main import app  # Aquí debes importar tu aplicación FastAPI
+from src.main import app  
 from src.routes import get_db
 
-# Definir la URL de la base de datos de pruebas (ajusta los detalles de conexión según tu configuración)
+# Definir la URL de la base de datos de pruebas 
 SQLALCHEMY_DATABASE_URL = "postgresql://kingdom_user:password@localhost:5432/kingdom_db"
 
 # Crear una base de datos de pruebas
@@ -16,6 +16,10 @@ TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engin
 # Fixture para la base de datos de prueba
 @pytest.fixture(scope="module")
 def test_db():
+    """
+    Fixture para inicializar y limpiar la base de datos en cada módulo de prueba.
+    Crea las tablas antes de cada prueba y las elimina después.
+    """
     # Crear las tablas antes de que comience la prueba
     Base.metadata.create_all(bind=engine)
     db = TestingSessionLocal()
@@ -29,12 +33,16 @@ def test_db():
 # Fixture para sobrescribir la dependencia get_db
 @pytest.fixture(scope="module")
 def client(test_db):
+    """
+    Fixture para configurar el cliente de pruebas FastAPI y sobrescribir la dependencia de la base de datos (get_db).
+    Esto asegura que las pruebas usen la base de datos de prueba en lugar de la base de datos real.
+    """
     def override_get_db():
         try:
             yield test_db
         finally:
             test_db.close()
-    
+
     # Sobrescribir la dependencia get_db por el test_db
     app.dependency_overrides[get_db] = override_get_db
 
@@ -48,6 +56,10 @@ def client(test_db):
 
 # Tests de las rutas
 def test_crear_reino(client):
+    """
+    Test para crear un nuevo reino usando el endpoint de creación de reinos.
+    Se verifica que el reino se crea correctamente con los valores por defecto para oro, madera, territorios, etc.
+    """
     # Enviar solicitud POST para crear un nuevo reino
     response = client.post("/api/v1/reinos/", json={"nombre": "Reino A"})
     
@@ -62,6 +74,9 @@ def test_crear_reino(client):
     assert data["estabilidad"] == 100
 
 def test_listar_reinos(client):
+    """
+    Test para listar todos los reinos. Se crean dos reinos y luego se verifica que la lista los contiene correctamente.
+    """
     # Crear dos reinos
     client.post("/api/v1/reinos/", json={"nombre": "Reino A"})
     client.post("/api/v1/reinos/", json={"nombre": "Reino B"})
@@ -77,6 +92,9 @@ def test_listar_reinos(client):
     assert data[1]["nombre"] == "Reino B"
 
 def test_actualizar_reino(client):
+    """
+    Test para actualizar el nombre de un reino. Se crea un reino y luego se actualiza su nombre.
+    """
     # Reiniciar la base de datos
     client.post("/api/v1/reset")
     
@@ -92,8 +110,10 @@ def test_actualizar_reino(client):
     data = response.json()
     assert data["nombre"] == "Nuevo Reino A"
 
-
 def test_borrar_reino(client):
+    """
+    Test para eliminar un reino. Se crea un reino y luego se elimina, verificando que la eliminación sea exitosa.
+    """
     # Reiniciar la base de datos
     client.post("/api/v1/reset")
     
@@ -109,6 +129,10 @@ def test_borrar_reino(client):
     assert response.json() == {"message": "Reino eliminado"}
 
 def test_realizar_accion_reino(client):
+    """
+    Test para realizar una acción en un reino. En este caso, se verifica que la acción de 'recolectar recursos' 
+    incremente los valores de oro y madera.
+    """
     # Reiniciar la base de datos
     client.post("/api/v1/reset")
     
@@ -138,8 +162,11 @@ def test_realizar_accion_reino(client):
     assert data["produccion"] == 20
     assert data["estabilidad"] == 100
 
-
 def test_reset_game(client):
+    """
+    Test para reiniciar el juego. Se crea un reino y luego se llama al endpoint de reiniciar,
+    verificando que todos los reinos sean eliminados.
+    """
     # Crear un reino
     client.post("/api/v1/reinos/", json={"nombre": "Reino A"})
     
@@ -148,4 +175,4 @@ def test_reset_game(client):
     
     # Verificar la respuesta
     assert response.status_code == 200
-    assert response.json() == {"message": "Juego reiniciado"} 
+    assert response.json() == {"message": "Juego reiniciado"}
